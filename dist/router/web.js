@@ -1,0 +1,24 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const userController_1 = __importDefault(require("../controller/userController"));
+const googleAuth_1 = __importDefault(require("../Auth/googleAuth"));
+const githubAuth_1 = __importDefault(require("../Auth/githubAuth"));
+const getUserDetails_1 = __importDefault(require("../controller/getUserDetails"));
+const SendOTP_1 = __importDefault(require("../OTP/SendOTP"));
+const limiter_1 = __importDefault(require("../middelware/limiter"));
+const VerifyOTP_1 = __importDefault(require("../OTP/VerifyOTP"));
+const router = express_1.default.Router();
+router.post("/registration", userController_1.default.userRegister);
+router.post("/login", userController_1.default.userLogin);
+router.post("/googleAuth", googleAuth_1.default.googleLogin);
+router.post("/githubAuth", githubAuth_1.default.githubAuth);
+router.get("/getUser", getUserDetails_1.default.getUserFun);
+router.post("/logOut", userController_1.default.userLogOut);
+router.post("/updateUserProfile", getUserDetails_1.default.getUserUpda);
+router.post("/sendMail", limiter_1.default, SendOTP_1.default);
+router.post("/verifyOtp", VerifyOTP_1.default);
+exports.default = router;
