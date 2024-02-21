@@ -17,10 +17,10 @@ const jwtTpken_1 = require("../token/jwtTpken");
 const userSchema_1 = require("../model/userSchema");
 const uploader_1 = __importDefault(require("../cloudinary/uploader"));
 const deleteImage_1 = __importDefault(require("../cloudinary/deleteImage"));
-class userDetails {
+class userInformation {
 }
-_a = userDetails;
-userDetails.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+_a = userInformation;
+userInformation.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
     const token = (_b = req.cookies) === null || _b === void 0 ? void 0 : _b.PetCaresAccessToken;
     const userDetails = (0, jwtTpken_1.verifyToken)(token);
@@ -45,7 +45,7 @@ userDetails.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, functio
         });
     }
 });
-userDetails.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+userInformation.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _e, _f, _g;
     try {
         const { image, userName } = req.body;
@@ -83,4 +83,4 @@ userDetails.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
 });
-exports.default = userDetails;
+exports.default = userInformation;

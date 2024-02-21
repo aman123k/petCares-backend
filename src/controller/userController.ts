@@ -2,11 +2,7 @@ import { UserModel } from "../model/userSchema";
 import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { createToken, verifyToken } from "../token/jwtTpken";
-interface userDetails {
-  user: {
-    username: string;
-  };
-}
+import { userDetails } from "../InterFace/interFace";
 
 class userController {
   static userRegister = async (req: Request, res: Response): Promise<void> => {
@@ -115,6 +111,10 @@ class userController {
         });
         return;
       }
+      res.status(200).json({
+        success: true,
+        response: "User already logedout",
+      });
     } catch {
       res.status(500).json({
         success: false,

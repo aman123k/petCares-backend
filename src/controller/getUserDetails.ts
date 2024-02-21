@@ -3,16 +3,12 @@ import { verifyToken } from "../token/jwtTpken";
 import { UserModel } from "../model/userSchema";
 import ImageUpload from "../cloudinary/uploader";
 import ImageDete from "../cloudinary/deleteImage";
-interface userDetails {
-  user: {
-    email: string;
-    _id: string;
-  };
-}
-class userDetails {
+import { userDetails } from "../InterFace/interFace";
+
+class userInformation {
   static getUserFun = async (req: Request, res: Response) => {
     const token = req.cookies?.PetCaresAccessToken;
-    const userDetails: userDetails = verifyToken(token) as userDetails;
+    const userDetails = verifyToken(token) as userDetails;
     const user = await UserModel.findOne({ email: userDetails?.user?.email });
 
     try {
@@ -80,4 +76,4 @@ class userDetails {
   };
 }
 
-export default userDetails;
+export default userInformation;
