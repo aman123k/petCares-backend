@@ -40,7 +40,6 @@ const removeUser = (user_Id) => {
 };
 io.on("connection", (socket) => {
     socket.on("userConnected", (connetUser) => {
-        console.log("connect user");
         connectedUser(connetUser.email, socket.id);
         io.emit("onlineUser", users);
     });
@@ -51,7 +50,6 @@ io.on("connection", (socket) => {
         io.to(user.id).emit("message", user);
     });
     socket.on("disconnect", () => {
-        console.log("disconnect");
         removeUser(socket.id);
         io.emit("onlineUser", users);
     });

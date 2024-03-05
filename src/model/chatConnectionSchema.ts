@@ -11,7 +11,7 @@ interface ChatConnection {
     email: string;
     picture: string;
   };
-  isBlock: string;
+  isBlock: string[];
   lastMessage: string;
   time: string;
   userEmail: string[];
@@ -28,7 +28,7 @@ const userSchema = new Schema({
 const chatConnectionSchema = new Schema<ChatDocument>({
   firstUser: { type: userSchema, required: true, trim: true },
   secondUser: { type: userSchema, required: true, trim: true },
-  isBlock: { type: String, trim: true },
+  isBlock: { type: [String], trim: true },
   lastMessage: { type: String, trim: true },
   time: { type: String, required: true, trim: true },
   userEmail: { type: [String], required: true, trim: true },

@@ -165,18 +165,50 @@ userChat.reciveMessage = (req, res) => __awaiter(void 0, void 0, void 0, functio
 });
 userChat.deleteChat = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { id } = req.body();
+        const { id } = req.body;
         const deleteMessage = yield chatSchema_1.messagesModel.deleteMany({ chatId: id });
-        const deleteConnection = yield chatConnectionSchema_1.ChatConnectionsModel.findByIdAndDelete({
-            id,
+        const deleteConnection = yield chatConnectionSchema_1.ChatConnectionsModel.findOneAndDelete({
+            _id: id,
         });
-        yield (deleteConnection === null || deleteConnection === void 0 ? void 0 : deleteConnection.save());
         res.status(200).json({
             success: true,
             response: "Chat deleted",
         });
     }
     catch (_p) {
+        res.status(500).json({
+            success: false,
+            response: "Server error",
+        });
+    }
+});
+userChat.blockUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { id, email, name } = req.body;
+        const alreayBlock = yield chatConnectionSchema_1.ChatConnectionsModel.findOne({ _id: id });
+        if (alreayBlock) {
+            if (!(alreayBlock === null || alreayBlock === void 0 ? void 0 : alreayBlock.isBlock.includes(email))) {
+                alreayBlock === null || alreayBlock === void 0 ? void 0 : alreayBlock.isBlock.push(email);
+                yield (alreayBlock === null || alreayBlock === void 0 ? void 0 : alreayBlock.save());
+                res.status(200).json({
+                    success: true,
+                    response: `you block ${name}`,
+                });
+            }
+            else {
+                const newdocs = alreayBlock.isBlock.filter((block) => {
+                    return block !== email;
+                });
+                alreayBlock.isBlock = newdocs;
+                yield alreayBlock.save();
+                res.status(200).json({
+                    success: true,
+                    response: `you unblock ${name}`,
+                });
+            }
+        }
+    }
+    catch (_q) {
         res.status(500).json({
             success: false,
             response: "Server error",

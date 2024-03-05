@@ -30,5 +30,6 @@ router.post("/createConnection", userChat.chatConnection);
 router.post("/sendMessage", userChat.Sendmessages);
 router.post("/reciveMessage", userChat.reciveMessage);
 router.post("/deleteChat", userChat.deleteChat);
+router.post("/blockUser", userChat.blockUser);
 
 export default router;

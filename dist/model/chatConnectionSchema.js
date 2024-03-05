@@ -10,7 +10,7 @@ const userSchema = new mongoose_1.Schema({
 const chatConnectionSchema = new mongoose_1.Schema({
     firstUser: { type: userSchema, required: true, trim: true },
     secondUser: { type: userSchema, required: true, trim: true },
-    isBlock: { type: String, trim: true },
+    isBlock: { type: [String], trim: true },
     lastMessage: { type: String, trim: true },
     time: { type: String, required: true, trim: true },
     userEmail: { type: [String], required: true, trim: true },

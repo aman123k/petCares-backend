@@ -185,6 +185,37 @@ class userChat {
       });
     }
   };
+  static blockUser = async (req: Request, res: Response) => {
+    try {
+      const { id, email, name } = req.body;
+      const alreayBlock = await ChatConnectionsModel.findOne({ _id: id });
+      if (alreayBlock) {
+        if (!alreayBlock?.isBlock.includes(email)) {
+          alreayBlock?.isBlock.push(email);
+          await alreayBlock?.save();
+          res.status(200).json({
+            success: true,
+            response: `you block ${name}`,
+          });
+        } else {
+          const newdocs = alreayBlock.isBlock.filter((block) => {
+            return block !== email;
+          });
+          alreayBlock.isBlock = newdocs;
+          await alreayBlock.save();
+          res.status(200).json({
+            success: true,
+            response: `you unblock ${name}`,
+          });
+        }
+      }
+    } catch {
+      res.status(500).json({
+        success: false,
+        response: "Server error",
+      });
+    }
+  };
 }
 
 export default userChat;
