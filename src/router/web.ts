@@ -8,6 +8,7 @@ import verifyOTP from "../OTP/VerifyOTP";
 import AddPetController from "../controller/ListPet";
 import userInformation from "../controller/getUserDetails";
 import GetPetInformation from "../controller/GetPetInformation";
+import userChat from "../controller/userChat";
 
 const router = express.Router();
 
@@ -24,5 +25,10 @@ router.post("/listApet", AddPetController.ListPet);
 router.post("/addFavourite", AddPetController.AddFavourites);
 router.get("/getPet", GetPetInformation.GetPet);
 router.get("/getFavourites", GetPetInformation.GetFavouritesPets);
+router.get("/allConnections", userChat.getChatConnection);
+router.post("/createConnection", userChat.chatConnection);
+router.post("/sendMessage", userChat.Sendmessages);
+router.post("/reciveMessage", userChat.reciveMessage);
+router.post("/deleteChat", userChat.deleteChat);
 
 export default router;

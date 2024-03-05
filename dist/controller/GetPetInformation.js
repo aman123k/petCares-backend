@@ -18,9 +18,13 @@ _a = GetPetInformation;
 GetPetInformation.GetPet = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = 15;
+        const limit = 10;
         const skip = (page - 1) * limit;
-        const PetData = yield listSchema_1.PetListModel.find().skip(skip).limit(limit);
+        const PetData = yield listSchema_1.PetListModel.find()
+            .sort({ _id: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
         const totalDoc = yield listSchema_1.PetListModel.countDocuments();
         res.status(200).json({
             success: true,

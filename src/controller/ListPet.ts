@@ -6,33 +6,41 @@ import { userDetails } from "../InterFace/interFace";
 
 class AddPetController {
   static ListPet = async (req: Request, res: Response) => {
-    const { pet, characteristics, reason, time, keyFact, petImage, petStory } =
-      req.body;
-    const token = req.cookies?.PetCaresAccessToken;
-    const userDetails = verifyToken(token) as userDetails;
-    const promises = petImage?.map((image: string) => ImageUpload(image));
-    const uploadedImages = await Promise.all(promises);
-
-    const petData = new PetListModel({
-      petType: pet,
-      petImage: uploadedImages,
-      petStory,
-      reason,
-      time,
-      characteristics,
-      keyFact,
-      Auth: {
-        email: userDetails?.user.email,
-        name: userDetails?.user?.username,
-      },
-    });
-    await petData.save();
-    res.status(200).json({
-      success: true,
-      response:
-        "Your pet listing has been submitted. Admin approval pending. Thanks!",
-    });
     try {
+      const {
+        pet,
+        characteristics,
+        reason,
+        time,
+        keyFact,
+        petImage,
+        petStory,
+      } = req.body;
+      const token = req.cookies?.PetCaresAccessToken;
+      const userDetails = verifyToken(token) as userDetails;
+      const promises = petImage?.map((image: string) => ImageUpload(image));
+      const uploadedImages = await Promise.all(promises);
+
+      const petData = new PetListModel({
+        petType: pet,
+        petImage: uploadedImages,
+        petStory,
+        reason,
+        time,
+        characteristics,
+        keyFact,
+        Auth: {
+          email: userDetails?.user.email,
+          name: userDetails?.user?.username,
+        },
+        postAddTime: new Date(),
+      });
+      await petData.save();
+      res.status(200).json({
+        success: true,
+        response:
+          "Your pet listing has been submitted. Admin approval pending. Thanks!",
+      });
     } catch {
       res.status(500).json({
         success: false,

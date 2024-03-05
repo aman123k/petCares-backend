@@ -1,5 +1,5 @@
 import { UserModel } from "../model/userSchema";
-import express, { Request, Response } from "express";
+import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { createToken, verifyToken } from "../token/jwtTpken";
 import { userDetails } from "../InterFace/interFace";
@@ -9,7 +9,9 @@ class userController {
     try {
       const { username, email, password, picture, registerType } = req.body;
       const hashPassword = await bcrypt.hash(password, 10);
-      const user = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({
+        email: { $regex: email, $options: "i" },
+      });
       if (user) {
         if (
           user?.registerType.length === 2 ||
@@ -57,7 +59,9 @@ class userController {
   static userLogin = async (req: Request, res: Response): Promise<void> => {
     try {
       const { email, password } = req.body;
-      const user = await UserModel.findOne({ email });
+      const user = await UserModel.findOne({
+        email: { $regex: email, $options: "i" },
+      });
       if (!user) {
         res.status(400).json({
           success: false,

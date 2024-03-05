@@ -7,9 +7,13 @@ class GetPetInformation {
   static GetPet = async (req: Request, res: Response) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
-      const limit = 15;
+      const limit = 10;
       const skip = (page - 1) * limit;
-      const PetData = await PetListModel.find().skip(skip).limit(limit);
+      const PetData = await PetListModel.find()
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean();
       const totalDoc = await PetListModel.countDocuments();
       res.status(200).json({
         success: true,

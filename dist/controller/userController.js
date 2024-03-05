@@ -23,7 +23,9 @@ userController.userRegister = (req, res) => __awaiter(void 0, void 0, void 0, fu
     try {
         const { username, email, password, picture, registerType } = req.body;
         const hashPassword = yield bcrypt_1.default.hash(password, 10);
-        const user = yield userSchema_1.UserModel.findOne({ email });
+        const user = yield userSchema_1.UserModel.findOne({
+            email: { $regex: email, $options: "i" },
+        });
         if (user) {
             if ((user === null || user === void 0 ? void 0 : user.registerType.length) === 2 ||
                 (user === null || user === void 0 ? void 0 : user.registerType[0]) === registerType[0] ||
@@ -70,7 +72,9 @@ userController.userRegister = (req, res) => __awaiter(void 0, void 0, void 0, fu
 userController.userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
-        const user = yield userSchema_1.UserModel.findOne({ email });
+        const user = yield userSchema_1.UserModel.findOne({
+            email: { $regex: email, $options: "i" },
+        });
         if (!user) {
             res.status(400).json({
                 success: false,

@@ -17,15 +17,21 @@ const jwtTpken_1 = require("../token/jwtTpken");
 const userSchema_1 = require("../model/userSchema");
 const uploader_1 = __importDefault(require("../cloudinary/uploader"));
 const deleteImage_1 = __importDefault(require("../cloudinary/deleteImage"));
+const chatConnectionSchema_1 = require("../model/chatConnectionSchema");
+const redisConnect_1 = __importDefault(require("../redis/redisConnect"));
 class userInformation {
 }
 _a = userInformation;
 userInformation.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
-    const token = (_b = req.cookies) === null || _b === void 0 ? void 0 : _b.PetCaresAccessToken;
-    const userDetails = (0, jwtTpken_1.verifyToken)(token);
-    const user = yield userSchema_1.UserModel.findOne({ email: (_c = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _c === void 0 ? void 0 : _c.email });
     try {
+        const token = (_b = req.cookies) === null || _b === void 0 ? void 0 : _b.PetCaresAccessToken;
+        const userDetails = (0, jwtTpken_1.verifyToken)(token);
+        const user = yield userSchema_1.UserModel.findOne({
+            email: (_c = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _c === void 0 ? void 0 : _c.email,
+        })
+            .select("-password")
+            .select("-registerType");
         if (user === null) {
             res.status(400).json({
                 success: false,
@@ -33,9 +39,13 @@ userInformation.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, fun
             });
             return;
         }
+        const RedisUser = yield redisConnect_1.default.get("user");
+        if (!RedisUser || RedisUser !== JSON.stringify(user)) {
+            redisConnect_1.default.set("user", JSON.stringify(user), { EX: 86400 });
+        }
         res.status(200).json({
             success: true,
-            response: user,
+            response: RedisUser ? JSON.parse(RedisUser) : user,
         });
     }
     catch (_d) {
@@ -46,7 +56,7 @@ userInformation.getUserFun = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 userInformation.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _e, _f, _g;
+    var _e, _f, _g, _h, _j, _k, _l;
     try {
         const { image, userName } = req.body;
         const token = (_e = req.cookies) === null || _e === void 0 ? void 0 : _e.PetCaresAccessToken;
@@ -62,13 +72,46 @@ userInformation.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, fu
                 picture: response,
                 username: userName,
             }, { options: true });
-            console.log(user);
+            const updated = yield chatConnectionSchema_1.ChatConnectionsModel.findOneAndUpdate({
+                "firstUser.email": (_h = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _h === void 0 ? void 0 : _h.email,
+            }, {
+                "firstUser.picture": response,
+                "firstUser.username": userName,
+            }, { options: true });
+            const updated2 = yield chatConnectionSchema_1.ChatConnectionsModel.findOneAndUpdate({
+                "secondUser.email": (_j = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _j === void 0 ? void 0 : _j.email,
+                "secondUser.username": userName,
+            }, {
+                "secondUser.picture": response,
+            }, { options: true });
+            if (updated) {
+                yield updated.save();
+            }
+            else {
+                updated2 === null || updated2 === void 0 ? void 0 : updated2.save();
+            }
             yield (user === null || user === void 0 ? void 0 : user.save());
         }
         else {
             const user = yield userSchema_1.UserModel.findByIdAndUpdate(id, {
                 username: userName,
             }, { options: true });
+            const updated = yield chatConnectionSchema_1.ChatConnectionsModel.findOneAndUpdate({
+                "firstUser.email": (_k = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _k === void 0 ? void 0 : _k.email,
+            }, {
+                "firstUser.username": userName,
+            }, { options: true });
+            const updated2 = yield chatConnectionSchema_1.ChatConnectionsModel.findOneAndUpdate({
+                "secondUser.email": (_l = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _l === void 0 ? void 0 : _l.email,
+            }, {
+                "secondUser.username": userName,
+            }, { options: true });
+            if (updated) {
+                yield updated.save();
+            }
+            else {
+                updated2 === null || updated2 === void 0 ? void 0 : updated2.save();
+            }
             yield (user === null || user === void 0 ? void 0 : user.save());
         }
         res.status(200).json({
@@ -76,7 +119,7 @@ userInformation.getUserUpda = (req, res) => __awaiter(void 0, void 0, void 0, fu
             response: "Profile updated sucessfully..",
         });
     }
-    catch (_h) {
+    catch (_m) {
         res.status(500).json({
             success: false,
             response: "Server error",

@@ -21,30 +21,31 @@ class AddPetController {
 _a = AddPetController;
 AddPetController.ListPet = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _b, _c;
-    const { pet, characteristics, reason, time, keyFact, petImage, petStory } = req.body;
-    const token = (_b = req.cookies) === null || _b === void 0 ? void 0 : _b.PetCaresAccessToken;
-    const userDetails = (0, jwtTpken_1.verifyToken)(token);
-    const promises = petImage === null || petImage === void 0 ? void 0 : petImage.map((image) => (0, uploader_1.default)(image));
-    const uploadedImages = yield Promise.all(promises);
-    const petData = new listSchema_1.PetListModel({
-        petType: pet,
-        petImage: uploadedImages,
-        petStory,
-        reason,
-        time,
-        characteristics,
-        keyFact,
-        Auth: {
-            email: userDetails === null || userDetails === void 0 ? void 0 : userDetails.user.email,
-            name: (_c = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _c === void 0 ? void 0 : _c.username,
-        },
-    });
-    yield petData.save();
-    res.status(200).json({
-        success: true,
-        response: "Your pet listing has been submitted. Admin approval pending. Thanks!",
-    });
     try {
+        const { pet, characteristics, reason, time, keyFact, petImage, petStory, } = req.body;
+        const token = (_b = req.cookies) === null || _b === void 0 ? void 0 : _b.PetCaresAccessToken;
+        const userDetails = (0, jwtTpken_1.verifyToken)(token);
+        const promises = petImage === null || petImage === void 0 ? void 0 : petImage.map((image) => (0, uploader_1.default)(image));
+        const uploadedImages = yield Promise.all(promises);
+        const petData = new listSchema_1.PetListModel({
+            petType: pet,
+            petImage: uploadedImages,
+            petStory,
+            reason,
+            time,
+            characteristics,
+            keyFact,
+            Auth: {
+                email: userDetails === null || userDetails === void 0 ? void 0 : userDetails.user.email,
+                name: (_c = userDetails === null || userDetails === void 0 ? void 0 : userDetails.user) === null || _c === void 0 ? void 0 : _c.username,
+            },
+            postAddTime: new Date(),
+        });
+        yield petData.save();
+        res.status(200).json({
+            success: true,
+            response: "Your pet listing has been submitted. Admin approval pending. Thanks!",
+        });
     }
     catch (_d) {
         res.status(500).json({
