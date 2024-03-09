@@ -8,6 +8,9 @@ import { Server as SocketServer, Socket } from "socket.io";
 config();
 
 const app: Application = express();
+app.get("/status", (req: Request, res: Response) => {
+  res.json({ status: "ok" });
+});
 app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
