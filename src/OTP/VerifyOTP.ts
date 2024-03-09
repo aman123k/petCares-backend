@@ -14,7 +14,9 @@ const verifyOTP = async (req: Request, res: Response) => {
         response: "Enter correct OTP...",
       });
     }
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({
+      email: { $regex: email, $options: "i" },
+    });
     const hashPassword = await bcrypt.hash(newPass, 10);
     const id = user?._id;
     const updatePass = await UserModel.findByIdAndUpdate(

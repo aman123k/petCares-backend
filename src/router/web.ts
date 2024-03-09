@@ -9,6 +9,8 @@ import AddPetController from "../controller/ListPet";
 import userInformation from "../controller/getUserDetails";
 import GetPetInformation from "../controller/GetPetInformation";
 import userChat from "../controller/userChat";
+import contactPetCares from "../controller/ContactPetCares";
+import checkout from "../Stripe/stripr";
 
 const router = express.Router();
 
@@ -31,5 +33,7 @@ router.post("/sendMessage", userChat.Sendmessages);
 router.post("/reciveMessage", userChat.reciveMessage);
 router.post("/deleteChat", userChat.deleteChat);
 router.post("/blockUser", userChat.blockUser);
+router.post("/contactPetCares", contactPetCares.contect);
+router.post("/create-check-out", checkout);
 
 export default router;

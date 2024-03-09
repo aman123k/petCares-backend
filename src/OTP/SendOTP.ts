@@ -7,7 +7,9 @@ const sendOTP = async (req: Request, res: Response) => {
   const { email } = req.body;
   const OTP: number = Math.floor(1000 + Math.random() * 9000);
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({
+      email: { $regex: email, $options: "i" },
+    });
     if (!user) {
       return res.status(404).json({
         success: false,
