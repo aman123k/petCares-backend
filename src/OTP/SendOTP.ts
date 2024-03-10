@@ -20,6 +20,7 @@ const sendOTP = async (req: Request, res: Response) => {
     if (!value) {
       client.set("OTP", OTP.toString(), { EX: 300 });
     }
+
     const mailOptions = {
       from: process.env.SENDER_EMAIL,
       to: email,
