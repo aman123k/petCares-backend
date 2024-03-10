@@ -18,7 +18,7 @@ const sendOTP = async (req: Request, res: Response) => {
     }
     const value = await client.get("OTP");
     if (!value) {
-      client.set("OTP", OTP.toString(), { EX: 300 });
+      await client.set("OTP", OTP.toString(), { EX: 300 });
     }
 
     const mailOptions = {

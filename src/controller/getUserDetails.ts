@@ -26,13 +26,14 @@ class userInformation {
       }
       const RedisUser = await client.get("user");
       if (!RedisUser || RedisUser !== JSON.stringify(user)) {
-        client.set("user", JSON.stringify(user), { EX: 86400 });
+        await client.set("user", JSON.stringify(user), { EX: 86400 });
       }
       res.status(200).json({
         success: true,
         response: RedisUser ? JSON.parse(RedisUser) : user,
       });
-    } catch {
+    } catch (err) {
+      console.log(err);
       res.status(500).json({
         success: false,
         response: "Server error",
