@@ -5,7 +5,7 @@ import connectDb from "./db/connectDb";
 import web from "./router/web";
 import cors from "cors";
 import { Server as SocketServer, Socket } from "socket.io";
-import client from "redis/redisConnect";
+import client from "./redis/redisConnect";
 config();
 
 async function startServer() {
