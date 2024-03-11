@@ -64,6 +64,7 @@ class userChat {
         response: "connection created",
       });
     } catch (error) {
+      console.log("chat connection error", error);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -92,7 +93,8 @@ class userChat {
         success: true,
         response: " Messages send",
       });
-    } catch {
+    } catch (err) {
+      console.log("send messages error", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -118,7 +120,8 @@ class userChat {
         success: true,
         response: allConnection,
       });
-    } catch {
+    } catch (err) {
+      console.log("get connetion error", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -158,7 +161,8 @@ class userChat {
         intialmessage:
           "PetCares: Monitoring adopter-rehouser chat for pet welfare and support",
       });
-    } catch {
+    } catch (err) {
+      console.log("recive messages err", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -178,7 +182,8 @@ class userChat {
         success: true,
         response: "Chat deleted",
       });
-    } catch {
+    } catch (err) {
+      console.log("delete chat", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -209,7 +214,8 @@ class userChat {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      console.log("block user", err);
       res.status(500).json({
         success: false,
         response: "Server error",

@@ -20,7 +20,8 @@ class GetPetInformation {
         response: PetData,
         totalDoc,
       });
-    } catch {
+    } catch (err) {
+      console.log("get pets error", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -38,7 +39,8 @@ class GetPetInformation {
         success: true,
         response: favoritePets,
       });
-    } catch {
+    } catch (err) {
+      console.log("get favourite pet", err);
       res.status(500).json({
         success: false,
         response: "Server error",

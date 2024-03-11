@@ -17,7 +17,8 @@ class contactPetCares {
         success: true,
         response: "Enquriy successfully send to Admin",
       });
-    } catch {
+    } catch (err) {
+      console.log("contact page", err);
       res.status(500).json({
         success: false,
         response: "Server error",

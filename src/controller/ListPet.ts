@@ -41,7 +41,8 @@ class AddPetController {
         response:
           "Your pet listing has been submitted. Admin approval pending. Thanks!",
       });
-    } catch {
+    } catch (err) {
+      console.log("list pet error", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -82,7 +83,8 @@ class AddPetController {
           });
         }
       }
-    } catch {
+    } catch (err) {
+      console.log("add favourite error", err);
       res.status(500).json({
         success: false,
         response: "Server error",

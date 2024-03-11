@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import { createToken, verifyToken } from "../token/jwtTpken";
 import { userDetails } from "../InterFace/interFace";
+import client from "../redis/redisConnect";
 
 class userController {
   static userRegister = async (req: Request, res: Response): Promise<void> => {
@@ -50,6 +51,7 @@ class userController {
         response: "User Register Successfully",
       });
     } catch (error) {
+      console.log("user register error", error);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -97,6 +99,7 @@ class userController {
         response: "User logged in successfully",
       });
     } catch (error) {
+      console.log("user login error", error);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -115,11 +118,13 @@ class userController {
         });
         return;
       }
-      res.status(200).json({
-        success: true,
-        response: "User already logedout",
-      });
-    } catch {
+      await client.set("user", ""),
+        res.status(200).json({
+          success: true,
+          response: "User already logedout",
+        });
+    } catch (err) {
+      console.log("user log out", err);
       res.status(500).json({
         success: false,
         response: "Server error",

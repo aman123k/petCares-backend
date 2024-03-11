@@ -30,10 +30,10 @@ class userInformation {
       }
       res.status(200).json({
         success: true,
-        response: RedisUser ? JSON.parse(RedisUser) : user,
+        response: RedisUser ? RedisUser : user,
       });
     } catch (err) {
-      console.log(err);
+      console.log("get user function", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -125,7 +125,8 @@ class userInformation {
         success: true,
         response: "Profile updated sucessfully..",
       });
-    } catch {
+    } catch (err) {
+      console.log("update user", err);
       res.status(500).json({
         success: false,
         response: "Server error",
