@@ -24,7 +24,7 @@ async function startServer() {
       })
     );
 
-    // await client.connect();
+    await client.connect();
     app.use("/", web);
 
     const DATABASE_URL: string = String(process.env.DATABASE_URL);

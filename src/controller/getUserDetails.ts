@@ -30,7 +30,7 @@ class userInformation {
       }
       res.status(200).json({
         success: true,
-        response: RedisUser ? RedisUser : user,
+        response: RedisUser ? JSON.parse(RedisUser) : user,
       });
     } catch (err) {
       console.log("get user function", err);
