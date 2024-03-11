@@ -52,7 +52,7 @@ class userChat {
           email: user2?.email,
           picture: user2?.picture,
         },
-        isBlock: "",
+        isBlock: [],
         userEmail: [user?.email, user2?.email],
         lastMessage:
           "PetCares: Monitoring adopter-rehouser chat for pet welfare and support",

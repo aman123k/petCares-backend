@@ -112,17 +112,18 @@ class userController {
     try {
       if (userDetais) {
         res.clearCookie("PetCaresAccessToken");
-        res.status(200).json({
-          success: true,
-          response: "User logout successfully...",
-        });
+        await client.set("user", ""),
+          res.status(200).json({
+            success: true,
+            response: "User logout successfully...",
+          });
         return;
       }
-      await client.set("user", ""),
-        res.status(200).json({
-          success: true,
-          response: "User already logedout",
-        });
+
+      res.status(200).json({
+        success: true,
+        response: "User already logedout",
+      });
     } catch (err) {
       console.log("user log out", err);
       res.status(500).json({
