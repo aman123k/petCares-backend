@@ -111,7 +111,13 @@ class userController {
     const userDetais = verifyToken(token) as userDetails;
     try {
       if (userDetais) {
-        res.clearCookie("PetCaresAccessToken");
+        res.cookie("PetCaresAccessToken", "", {
+          httpOnly: true,
+          secure: true,
+          path: "/",
+          expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+          sameSite: "none",
+        });
         await client.set("user", ""),
           res.status(200).json({
             success: true,
