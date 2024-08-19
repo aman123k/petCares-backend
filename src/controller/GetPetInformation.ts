@@ -34,7 +34,7 @@ class GetPetInformation {
       const userDetails = verifyToken(token) as userDetails;
       const favoritePets = await PetListModel.find({
         Favourites: userDetails?.user?.email,
-      });
+      }).select("-Favourites");
       res.status(200).json({
         success: true,
         response: favoritePets,

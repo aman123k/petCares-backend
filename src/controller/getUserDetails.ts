@@ -24,9 +24,9 @@ class userInformation {
         });
         return;
       }
-      const RedisUser = await client.get("user");
+      const RedisUser = await client.get(user.email);
       if (!RedisUser || RedisUser !== JSON.stringify(user)) {
-        await client.set("user", JSON.stringify(user), { EX: 86400 });
+        await client.set(user?.email, JSON.stringify(user), { EX: 86400 });
       }
       res.status(200).json({
         success: true,
