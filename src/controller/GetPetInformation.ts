@@ -7,13 +7,27 @@ class GetPetInformation {
   static GetPet = async (req: Request, res: Response) => {
     try {
       const page = parseInt(req.query.page as string) || 1;
+      const petType = req.query.type as string;
+      const petBreed = req.query.breed as string;
       const limit = 10;
       const skip = (page - 1) * limit;
-      const PetData = await PetListModel.find()
+
+      const query: any = {};
+      if (petType !== "all") {
+        query.petType = petType;
+      }
+      if (petBreed !== "all") {
+        query["characteristics.petBreed"] = petBreed;
+      }
+
+      const PetData = await PetListModel.find({
+        $and: [query],
+      })
         .sort({ _id: -1 })
         .skip(skip)
         .limit(limit)
         .lean();
+
       const totalDoc = await PetListModel.countDocuments();
       res.status(200).json({
         success: true,
