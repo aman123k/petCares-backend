@@ -28,7 +28,7 @@ class GetPetInformation {
         .limit(limit)
         .lean();
 
-      const totalDoc = await PetListModel.countDocuments();
+      const totalDoc = await PetListModel.countDocuments(query);
       res.status(200).json({
         success: true,
         response: PetData,
