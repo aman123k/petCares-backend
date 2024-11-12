@@ -12,7 +12,11 @@ class GetPetInformation {
       const limit = 10;
       const skip = (page - 1) * limit;
 
-      const query: any = {};
+      const query: any = {
+        isApproved: true,
+        isAdopted: false,
+      };
+
       if (petType !== "all") {
         query.petType = petType;
       }
@@ -26,9 +30,11 @@ class GetPetInformation {
         .sort({ _id: -1 })
         .skip(skip)
         .limit(limit)
-        .lean();
+        .lean()
+        .select("-isApproved -isAdopted -Favourites");
 
       const totalDoc = await PetListModel.countDocuments(query);
+
       res.status(200).json({
         success: true,
         response: PetData,
@@ -48,7 +54,7 @@ class GetPetInformation {
       const userDetails = verifyToken(token) as userDetails;
       const favoritePets = await PetListModel.find({
         Favourites: userDetails?.user?.email,
-      }).select("-Favourites");
+      }).select("-Favourites -isApproved -isAdopted -isApproved -isAdopted");
       res.status(200).json({
         success: true,
         response: favoritePets,

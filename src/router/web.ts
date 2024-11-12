@@ -11,6 +11,7 @@ import GetPetInformation from "../controller/GetPetInformation";
 import userChat from "../controller/userChat";
 import contactPetCares from "../controller/ContactPetCares";
 import checkout from "../Stripe/stripr";
+import handlePaymentSuccess from "../Stripe/successPayment";
 
 const router = express.Router();
 
@@ -35,5 +36,6 @@ router.post("/deleteChat", userChat.deleteChat);
 router.post("/blockUser", userChat.blockUser);
 router.post("/contactPetCares", contactPetCares.contect);
 router.post("/create-check-out", checkout);
+router.post("/payment-success", handlePaymentSuccess);
 
 export default router;

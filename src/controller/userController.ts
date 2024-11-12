@@ -21,7 +21,7 @@ class userController {
         ) {
           res.status(400).json({
             success: false,
-            response: `User already exist please login with ${user.loginType}`,
+            response: `User already exists. Please log in using ${user.loginType}.`,
           });
           return;
         } else {
@@ -96,7 +96,7 @@ class userController {
       });
       res.status(200).json({
         success: true,
-        response: "User logged in successfully",
+        response: "Login successful",
       });
     } catch (error) {
       console.log("user login error", error);

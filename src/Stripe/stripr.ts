@@ -1,13 +1,16 @@
 import { config } from "dotenv";
 import { Request, Response } from "express";
-import { PetsdataType } from "../InterFace/interFace";
 import { PetListModel } from "../model/listSchema";
+import { verifyToken } from "../token/jwtTpken";
+import { userDetails } from "InterFace/interFace";
 config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_API_KEY);
 
 const checkout = async (req: Request, res: Response) => {
   try {
     const { id, fee } = req.body;
+    const token = req.cookies?.PetCaresAccessToken;
+    const userDetais = verifyToken(token) as userDetails;
 
     if (!id || !fee) {
       return res.status(400).json({
@@ -15,9 +18,8 @@ const checkout = async (req: Request, res: Response) => {
         error: "Pet details and fee are required.",
       });
     }
-    const findPet = await PetListModel.findOne({ _id: id });
-    console.log(findPet);
 
+    const findPet = await PetListModel.findOne({ _id: id });
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -28,14 +30,19 @@ const checkout = async (req: Request, res: Response) => {
               name: findPet?.characteristics?.petName,
               images: [findPet?.petImage[0]],
               description: `Color: ${findPet?.characteristics?.petColor}, Breed: ${findPet?.characteristics?.petBreed}, Size: ${findPet?.characteristics?.petSize}, Age: ${findPet?.characteristics?.petAge}, Reason for Rehousing: ${findPet?.reason}`,
+              // metadata: {
+              //   petId: findPet?._id,
+              //   userId: userDetais?.user?.email,
+              // },
             },
             unit_amount: fee * 100,
           },
           quantity: 1,
         },
       ],
+      customer_email: userDetais?.user?.email,
       mode: "payment",
-      success_url: `${process.env.RequestPort}/success`,
+      success_url: `${process.env.RequestPort}/success?session_id={CHECKOUT_SESSION_ID}'`,
       cancel_url: `${process.env.RequestPort}/cancel`,
       shipping_address_collection: {
         allowed_countries: [

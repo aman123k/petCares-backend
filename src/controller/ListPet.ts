@@ -33,6 +33,8 @@ class AddPetController {
           email: userDetails?.user.email,
           name: userDetails?.user?.username,
         },
+        isApproved: false,
+        isAdopted: false,
         postAddTime: new Date(),
       });
       await petData.save();
