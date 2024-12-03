@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
 import { verifyToken } from "../token/jwtTpken";
 import { userDetails } from "../InterFace/interFace";
-import client from "redis/redisConnect";
+import client from "../redis/redisConnect";
 
 class GetPetInformation {
   static GetPet = async (req: Request, res: Response) => {
