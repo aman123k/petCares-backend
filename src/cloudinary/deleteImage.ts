@@ -14,8 +14,8 @@ const ImageDete = async (image: string) => {
   const ImageName = splitImage.split(".")[0];
   try {
     await cloudinary.uploader.destroy(ImageName);
-  } catch {
-    console.log("error");
+  } catch (err) {
+    console.log("error", err);
   }
 };
 

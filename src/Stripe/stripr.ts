@@ -43,7 +43,7 @@ const checkout = async (req: Request, res: Response) => {
       customer_email: userDetais?.user?.email,
       mode: "payment",
       success_url: `${process.env.RequestPort}/success?session_id={CHECKOUT_SESSION_ID}'`,
-      cancel_url: `${process.env.RequestPort}/cancel`,
+      cancel_url: `${process.env.RequestPort}/adopt-a-pet`,
       shipping_address_collection: {
         allowed_countries: [
           "AC",

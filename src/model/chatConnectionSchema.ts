@@ -1,16 +1,9 @@
 import { Document, Schema, model } from "mongoose";
+import { User } from "./userSchema";
 
 interface ChatConnection {
-  firstUser: {
-    username: string;
-    email: string;
-    picture: string;
-  };
-  secondUser: {
-    username: string;
-    email: string;
-    picture: string;
-  };
+  firstUser: User;
+  secondUser: User;
   isBlock: string[];
   lastMessage: string;
   time: string;
@@ -19,15 +12,9 @@ interface ChatConnection {
 
 interface ChatDocument extends ChatConnection, Document {}
 
-const userSchema = new Schema({
-  username: String,
-  email: String,
-  picture: String,
-});
-
 const chatConnectionSchema = new Schema<ChatDocument>({
-  firstUser: { type: userSchema, required: true, trim: true },
-  secondUser: { type: userSchema, required: true, trim: true },
+  firstUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  secondUser: { type: Schema.Types.ObjectId, ref: "User", required: true },
   isBlock: { type: [String], trim: true },
   lastMessage: { type: String, trim: true },
   time: { type: String, required: true, trim: true },

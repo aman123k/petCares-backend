@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
-
 import { verifyToken } from "../token/jwtTpken";
 import { userDetails } from "../InterFace/interFace";
+import client from "redis/redisConnect";
+
 class GetPetInformation {
   static GetPet = async (req: Request, res: Response) => {
     try {
@@ -24,6 +25,20 @@ class GetPetInformation {
         query["characteristics.petBreed"] = petBreed;
       }
 
+      // Create a cache key based on the query parameters
+      const cacheKey = `pets:${page}:${petType}:${petBreed}`;
+
+      // Check if the data is in the cache
+      const cachedData = await client.get(cacheKey);
+      if (cachedData) {
+        const { data, totalDoc } = JSON.parse(cachedData);
+        return res.status(200).json({
+          success: true,
+          response: data,
+          totalDoc,
+        });
+      }
+
       const PetData = await PetListModel.find({
         $and: [query],
       })
@@ -34,6 +49,11 @@ class GetPetInformation {
         .select("-isApproved -isAdopted -Favourites");
 
       const totalDoc = await PetListModel.countDocuments(query);
+
+      // Store the result in the cache with an expiration time (e.g., 1 hour)
+      await client.set(cacheKey, JSON.stringify({ data: PetData, totalDoc }), {
+        EX: 3600,
+      });
 
       res.status(200).json({
         success: true,

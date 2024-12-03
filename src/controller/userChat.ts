@@ -16,22 +16,24 @@ interface Message {
 }
 
 class userChat {
+  // Create chat connection
   static chatConnection = async (req: Request, res: Response) => {
     try {
       const { email } = req.body;
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
       // Find users
-      const user = await UserModel.findOne({ email });
-      const user2 = await UserModel.findOne({
+      const firstUser = await UserModel.findOne({ email });
+      const secondUser = await UserModel.findOne({
         email: userDetails?.user?.email,
       });
+
       const existUser = await ChatConnectionsModel.find({
-        $or: [
+        $and: [
           {
-            userEmail: [userDetails?.user?.email, email],
+            firstUser: firstUser,
           },
-          { userEmail: [email, userDetails?.user?.email] },
+          { secondUser: secondUser },
         ],
       });
 
@@ -42,18 +44,10 @@ class userChat {
         });
       }
       const Connection = new ChatConnectionsModel({
-        firstUser: {
-          username: user?.username,
-          email: user?.email,
-          picture: user?.picture,
-        },
-        secondUser: {
-          username: user2?.username,
-          email: user2?.email,
-          picture: user2?.picture,
-        },
+        firstUser: firstUser,
+        secondUser: secondUser,
         isBlock: [],
-        userEmail: [user?.email, user2?.email],
+        userEmail: [firstUser?.email, secondUser?.email],
         lastMessage:
           "PetCares: Monitoring adopter-rehouser chat for pet welfare and support",
         time: new Date(),
@@ -71,6 +65,45 @@ class userChat {
       });
     }
   };
+
+  //get ChatConnection
+  static getChatConnection = async (req: Request, res: Response) => {
+    try {
+      const token = req.cookies?.PetCaresAccessToken;
+      const userDetais = verifyToken(token) as userDetails;
+      const id = userDetais?.user?._id;
+      const allConnection = await ChatConnectionsModel.find({
+        $or: [
+          {
+            firstUser: id,
+          },
+          {
+            secondUser: id,
+          },
+        ],
+      })
+        .populate({
+          path: "firstUser",
+          select: "-password -registerType -loginType",
+        })
+        .populate({
+          path: "secondUser",
+          select: "-password -registerType -loginType",
+        });
+
+      res.status(200).json({
+        success: true,
+        response: allConnection,
+      });
+    } catch (err) {
+      console.log("get connection error", err);
+      res.status(500).json({
+        success: false,
+        response: "Server error",
+      });
+    }
+  };
+  // Send Message fun
   static Sendmessages = async (req: Request, res: Response) => {
     try {
       const { id, message } = req.body;
@@ -82,16 +115,15 @@ class userChat {
         chatId: id,
         time: new Date(),
       });
-      const connectionMessage = await ChatConnectionsModel.findByIdAndUpdate(
+      await ChatConnectionsModel.findByIdAndUpdate(
         id,
         { lastMessage: message, time: new Date() },
         { new: true }
       );
-      await connectionMessage?.save();
       await chats.save();
       res.status(200).json({
         success: true,
-        response: " Messages send",
+        response: "Messages send",
       });
     } catch (err) {
       console.log("send messages error", err);
@@ -101,33 +133,7 @@ class userChat {
       });
     }
   };
-  static getChatConnection = async (req: Request, res: Response) => {
-    try {
-      const token = req.cookies?.PetCaresAccessToken;
-      const userDetais = verifyToken(token) as userDetails;
-      const allConnection = await ChatConnectionsModel.find({
-        $or: [
-          {
-            "firstUser.email": userDetais?.user?.email,
-          },
-          {
-            "secondUser.email": userDetais?.user?.email,
-          },
-        ],
-      });
 
-      res.status(200).json({
-        success: true,
-        response: allConnection,
-      });
-    } catch (err) {
-      console.log("get connetion error", err);
-      res.status(500).json({
-        success: false,
-        response: "Server error",
-      });
-    }
-  };
   static reciveMessage = async (req: Request, res: Response) => {
     try {
       const { id } = req.body;
@@ -169,7 +175,7 @@ class userChat {
       });
     }
   };
-
+  // Chat Delete
   static deleteChat = async (req: Request, res: Response) => {
     try {
       const { id } = req.body;
@@ -190,29 +196,29 @@ class userChat {
       });
     }
   };
+  // User Block
   static blockUser = async (req: Request, res: Response) => {
     try {
       const { id, email, name } = req.body;
       const alreayBlock = await ChatConnectionsModel.findOne({ _id: id });
-      if (alreayBlock) {
-        if (!alreayBlock?.isBlock.includes(email)) {
-          alreayBlock?.isBlock.push(email);
-          await alreayBlock?.save();
-          res.status(200).json({
-            success: true,
-            response: `you block ${name}`,
-          });
-        } else {
-          const newdocs = alreayBlock.isBlock.filter((block) => {
-            return block !== email;
-          });
-          alreayBlock.isBlock = newdocs;
-          await alreayBlock.save();
-          res.status(200).json({
-            success: true,
-            response: `you unblock ${name}`,
-          });
-        }
+
+      if (!alreayBlock?.isBlock.includes(email)) {
+        alreayBlock?.isBlock.push(email);
+        await alreayBlock?.save();
+        res.status(200).json({
+          success: true,
+          response: `you block ${name}`,
+        });
+      } else {
+        const newdocs = alreayBlock.isBlock.filter((block) => {
+          return block !== email;
+        });
+        alreayBlock.isBlock = newdocs;
+        await alreayBlock.save();
+        res.status(200).json({
+          success: true,
+          response: `you unblock ${name}`,
+        });
       }
     } catch (err) {
       console.log("block user", err);

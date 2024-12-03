@@ -12,11 +12,23 @@ class userInformation {
     try {
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
-      const user = await UserModel.findOne({
-        email: userDetails?.user?.email,
-      })
-        .select("-password")
-        .select("-registerType");
+      const userEmail = userDetails?.user?.email;
+
+      // Check Redis cache first if user data is there then retun the user data
+
+      const RedisUser = await client.get(userEmail);
+      if (RedisUser) {
+        return res.status(200).json({
+          success: true,
+          response: JSON.parse(RedisUser),
+        });
+      }
+
+      // If not found in cache, fetch from database
+      const user = await UserModel.findOne({ email: userEmail }).select(
+        "-password -registerType"
+      );
+
       if (user === null) {
         res.status(400).json({
           success: false,
@@ -24,13 +36,13 @@ class userInformation {
         });
         return;
       }
-      const RedisUser = await client.get(user.email);
-      if (!RedisUser || RedisUser !== JSON.stringify(user)) {
-        await client.set(user?.email, JSON.stringify(user), { EX: 86400 });
-      }
+
+      // Cache the user data in Redis
+      await client.set(userEmail, JSON.stringify(user), { EX: 86400 });
+
       res.status(200).json({
         success: true,
-        response: RedisUser ? JSON.parse(RedisUser) : user,
+        response: user,
       });
     } catch (err) {
       console.log("get user function", err);
@@ -50,80 +62,43 @@ class userInformation {
         email: userDetails?.user?.email,
       });
 
-      const id = userDet?._id;
-      if (image) {
-        await ImageDete(userDet?.picture ?? "");
-        const response = await ImageUpload(image);
-        const user = await UserModel.findByIdAndUpdate(
-          id,
-          {
-            picture: response,
-            username: userName,
-          },
-          { options: true }
-        );
-        const updated = await ChatConnectionsModel.findOneAndUpdate(
-          {
-            "firstUser.email": userDetails?.user?.email,
-          },
-          {
-            "firstUser.picture": response,
-            "firstUser.username": userName,
-          },
-          { options: true }
-        );
-        const updated2 = await ChatConnectionsModel.findOneAndUpdate(
-          {
-            "secondUser.email": userDetails?.user?.email,
-            "secondUser.username": userName,
-          },
-          {
-            "secondUser.picture": response,
-          },
-          { options: true }
-        );
-        if (updated) {
-          await updated.save();
-        } else {
-          updated2?.save();
-        }
-        await user?.save();
-      } else {
-        const user = await UserModel.findByIdAndUpdate(
-          id,
-          {
-            username: userName,
-          },
-          { options: true }
-        );
-        const updated = await ChatConnectionsModel.findOneAndUpdate(
-          {
-            "firstUser.email": userDetails?.user?.email,
-          },
-          {
-            "firstUser.username": userName,
-          },
-          { options: true }
-        );
-        const updated2 = await ChatConnectionsModel.findOneAndUpdate(
-          {
-            "secondUser.email": userDetails?.user?.email,
-          },
-          {
-            "secondUser.username": userName,
-          },
-          { options: true }
-        );
-        if (updated) {
-          await updated.save();
-        } else {
-          updated2?.save();
-        }
-        await user?.save();
+      if (!userDet) {
+        return res.status(404).json({
+          success: false,
+          response: "User not found.",
+        });
       }
+
+      const id = userDet._id;
+
+      // Function to update user and chat connections
+      const updateUserAndChat = async (updateData: any) => {
+        await UserModel.findByIdAndUpdate(id, updateData, { new: true });
+
+        await ChatConnectionsModel.findOneAndUpdate(
+          { "firstUser.email": userDetails?.user?.email },
+          { "firstUser.username": userName, ...updateData },
+          { new: true }
+        );
+
+        await ChatConnectionsModel.findOneAndUpdate(
+          { "secondUser.email": userDetails?.user?.email },
+          { "secondUser.username": userName, ...updateData },
+          { new: true }
+        );
+      };
+
+      if (image) {
+        await ImageDete(userDet.picture ?? "");
+        const response = await ImageUpload(image);
+        await updateUserAndChat({ picture: response, username: userName });
+      } else {
+        await updateUserAndChat({ username: userName });
+      }
+
       res.status(200).json({
         success: true,
-        response: "Profile updated sucessfully..",
+        response: "Profile updated successfully.",
       });
     } catch (err) {
       console.log("update user", err);
