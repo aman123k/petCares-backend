@@ -35,11 +35,29 @@ class AuthFile {
       const userDetails = await userDetailsResponse.json();
       const user = await UserModel.findOne({ email: userDetails?.email });
 
-      if (user?.loginType !== "github") {
-        res.status(400).json({
-          success: false,
-          response: `User already exist please login with ${user?.loginType}`,
-        });
+      if (user) {
+        if (user?.loginType !== "github") {
+          res.status(400).json({
+            success: false,
+            response: `User already exist please login with ${user?.loginType}`,
+          });
+          return;
+        } else {
+          // Set Cookie
+          const accessToken = createToken(user);
+          res.cookie("PetCaresAccessToken", accessToken, {
+            httpOnly: true,
+            secure: true,
+            path: "/",
+            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            sameSite: "none",
+          });
+
+          res.status(201).json({
+            success: true,
+            response: "User Register Successfully",
+          });
+        }
         return;
       }
 
@@ -51,10 +69,10 @@ class AuthFile {
         registerType: ["adopter"],
         loginType: "github",
       });
-      await newUser.save();
+      const savedUser = await newUser.save();
 
       // Set Token
-      const accessToken = createToken(newUser);
+      const accessToken = createToken(savedUser);
       res.cookie("PetCaresAccessToken", accessToken, {
         httpOnly: true,
         secure: true,
@@ -67,8 +85,8 @@ class AuthFile {
         success: true,
         response: "User Register Successfully",
       });
-    } catch {
-      console.log("error");
+    } catch (err) {
+      console.log("github err", err);
     }
   };
 }

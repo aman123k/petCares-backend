@@ -12,12 +12,29 @@ class authFile {
       );
       const result = await response.json();
       const user = await UserModel.findOne({ email: result?.email });
+      if (user) {
+        if (user?.loginType !== "google") {
+          res.status(400).json({
+            success: false,
+            response: `User already exist please login with ${user?.loginType}`,
+          });
+          return;
+        } else {
+          // Set Cookie
+          const accessToken = createToken(user);
+          res.cookie("PetCaresAccessToken", accessToken, {
+            httpOnly: true,
+            secure: true,
+            path: "/",
+            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            sameSite: "none",
+          });
 
-      if (user?.loginType !== "google") {
-        res.status(400).json({
-          success: false,
-          response: `User already exist please login with ${user?.loginType}`,
-        });
+          res.status(201).json({
+            success: true,
+            response: "User Register Successfully",
+          });
+        }
         return;
       }
 
@@ -29,10 +46,10 @@ class authFile {
         registerType,
         loginType: "google",
       });
-      await newUser.save();
+      const savedUser = await newUser.save();
 
       // Set Cookie
-      const accessToken = createToken(newUser);
+      const accessToken = createToken(savedUser);
       res.cookie("PetCaresAccessToken", accessToken, {
         httpOnly: true,
         secure: true,
@@ -45,7 +62,8 @@ class authFile {
         success: true,
         response: "User Register Successfully",
       });
-    } catch {
+    } catch (err) {
+      console.log("google auth", err);
       res.status(500).json({
         success: false,
         response: "Server error",
