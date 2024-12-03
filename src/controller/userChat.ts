@@ -207,7 +207,7 @@ class userChat {
         await alreayBlock?.save();
         res.status(200).json({
           success: true,
-          response: `you block ${name}`,
+          response: `You block ${name}`,
         });
       } else {
         const newdocs = alreayBlock.isBlock.filter((block) => {
@@ -217,7 +217,7 @@ class userChat {
         await alreayBlock.save();
         res.status(200).json({
           success: true,
-          response: `you unblock ${name}`,
+          response: `You unblock ${name}`,
         });
       }
     } catch (err) {

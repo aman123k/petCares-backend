@@ -33,84 +33,16 @@ class AuthFile {
         },
       });
       const userDetails = await userDetailsResponse.json();
-
       const user = await UserModel.findOne({ email: userDetails?.email });
-      const token = req.cookies?.PetCaresAccessToken;
 
-      if (user) {
-        if (user?.loginType !== "github") {
-          res.status(400).json({
-            success: false,
-            response: `User already exist please login with ${user.loginType}`,
-          });
-          return;
-        } else if (
-          user?.registerType.length !== 2 &&
-          user?.registerType[0] !== "rehouser"
-        ) {
-          user.registerType.push("rehouser");
-          const accessToken = createToken({
-            username: user?.username,
-            email: user?.email,
-            password: user?.password,
-            picture: user?.picture,
-            registerType: user?.registerType,
-            loginType: user?.loginType,
-          });
-          res.cookie("PetCaresAccessToken", accessToken, {
-            httpOnly: true,
-            secure: true,
-            path: "/",
-            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            sameSite: "none",
-          });
-          await UserModel.findByIdAndUpdate(user._id, {
-            registerType: user.registerType,
-          });
-          res.status(201).json({
-            success: true,
-            response: "User added Successfully",
-          });
-        } else {
-          const accessToken = createToken({
-            username: user?.username,
-            email: user?.email,
-            password: user?.password,
-            picture: user?.picture,
-            registerType: user?.registerType,
-            loginType: user?.loginType,
-          });
-
-          res.cookie("PetCaresAccessToken", accessToken, {
-            httpOnly: true,
-            secure: true,
-            path: "/",
-            expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            sameSite: "none",
-          });
-
-          res.status(201).json({
-            success: true,
-            response: "User Login Successfully",
-          });
-        }
+      if (user?.loginType !== "github") {
+        res.status(400).json({
+          success: false,
+          response: `User already exist please login with ${user?.loginType}`,
+        });
         return;
       }
-      const accessToken = createToken({
-        username: userDetails?.name,
-        email: userDetails?.email,
-        password: " ",
-        picture: userDetails?.avatar_url,
-        registerType: ["adopter"],
-        loginType: "github",
-      });
-      res.cookie("PetCaresAccessToken", accessToken, {
-        httpOnly: true,
-        secure: true,
-        path: "/",
-        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-        sameSite: "none",
-      });
+
       const newUser = new UserModel({
         username: userDetails?.name,
         email: userDetails?.email,
@@ -120,6 +52,17 @@ class AuthFile {
         loginType: "github",
       });
       await newUser.save();
+
+      // Set Token
+      const accessToken = createToken(newUser);
+      res.cookie("PetCaresAccessToken", accessToken, {
+        httpOnly: true,
+        secure: true,
+        path: "/",
+        expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+        sameSite: "none",
+      });
+
       res.status(201).json({
         success: true,
         response: "User Register Successfully",

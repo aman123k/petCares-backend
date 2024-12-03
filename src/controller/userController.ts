@@ -13,30 +13,14 @@ class userController {
       const user = await UserModel.findOne({
         email: { $regex: email, $options: "i" },
       });
-      if (user) {
-        if (
-          user?.registerType.length === 2 ||
-          user?.registerType[0] === registerType[0] ||
-          user?.password === ""
-        ) {
-          res.status(400).json({
-            success: false,
-            response: `User already exists. Please log in using ${user.loginType}.`,
-          });
-          return;
-        } else {
-          user.registerType.push(registerType[0]);
-          await UserModel.findByIdAndUpdate(user._id, {
-            registerType: user.registerType,
-          });
-          res.status(201).json({
-            success: true,
-            response: "User added Successfully",
-          });
-        }
+
+      if (user?.password.trim() === "") {
+        res.status(400).json({
+          success: false,
+          response: `User already exists. Please log in using ${user.loginType}.`,
+        });
         return;
       }
-
       const newUser = new UserModel({
         username,
         email,
