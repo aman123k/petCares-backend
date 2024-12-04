@@ -12,7 +12,7 @@ class userInformation {
     try {
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
-      const userEmail = userDetails?.user?.email;
+      const userEmail: string = userDetails?.user?.email;
 
       // Check Redis cache first if user data is there then retun the user data
 
@@ -69,23 +69,11 @@ class userInformation {
         });
       }
 
-      const id = userDet._id;
+      const id = userDet?._id;
 
       // Function to update user and chat connections
       const updateUserAndChat = async (updateData: any) => {
         await UserModel.findByIdAndUpdate(id, updateData, { new: true });
-
-        await ChatConnectionsModel.findOneAndUpdate(
-          { "firstUser.email": userDetails?.user?.email },
-          { "firstUser.username": userName, ...updateData },
-          { new: true }
-        );
-
-        await ChatConnectionsModel.findOneAndUpdate(
-          { "secondUser.email": userDetails?.user?.email },
-          { "secondUser.username": userName, ...updateData },
-          { new: true }
-        );
       };
 
       if (image) {

@@ -93,6 +93,7 @@ class userController {
   static userLogOut = async (req: Request, res: Response): Promise<void> => {
     const token = req.cookies?.PetCaresAccessToken;
     const userDetais = verifyToken(token) as userDetails;
+    const userEmail: string = userDetais?.user?.email;
     try {
       if (userDetais) {
         res.cookie("PetCaresAccessToken", "", {
@@ -102,7 +103,7 @@ class userController {
           expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           sameSite: "none",
         });
-        await client.set("user", ""),
+        await client.set(userEmail, ""),
           res.status(200).json({
             success: true,
             response: "User logout successfully...",
