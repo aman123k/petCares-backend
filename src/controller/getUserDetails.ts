@@ -56,7 +56,8 @@ class userInformation {
     try {
       const { image, userName } = req.body;
       const token = req.cookies?.PetCaresAccessToken;
-      const userDetails: userDetails = verifyToken(token) as userDetails;
+      const userDetails = verifyToken(token) as userDetails;
+      const userEmail: string = userDetails?.user?.email;
 
       const userDet = await UserModel.findOne({
         email: userDetails?.user?.email,
@@ -73,7 +74,11 @@ class userInformation {
 
       // Function to update user and chat connections
       const updateUserAndChat = async (updateData: any) => {
-        await UserModel.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedUser = await UserModel.findByIdAndUpdate(id, updateData, {
+          new: true,
+        });
+        // update user in radis
+        await client.set(userEmail, JSON.stringify(updatedUser), { EX: 86400 });
       };
 
       if (image) {
