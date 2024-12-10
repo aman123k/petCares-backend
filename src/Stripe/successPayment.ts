@@ -2,6 +2,7 @@ import { config } from "dotenv";
 import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
 import nodemailer from "nodemailer";
+import client from "../redis/redisConnect";
 config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_API_KEY);
 
@@ -161,6 +162,11 @@ const handlePaymentSuccess = async (req: Request, res: Response) => {
           console.log("Email sent:", info.response);
         }
       });
+
+      const keys = await client.keys("pets:*");
+      if (keys.length > 0) {
+        await client.del(keys);
+      }
 
       res.status(200).json({
         success: true,

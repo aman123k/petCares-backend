@@ -4,7 +4,6 @@ import { UserModel } from "../model/userSchema";
 import ImageUpload from "../cloudinary/uploader";
 import ImageDete from "../cloudinary/deleteImage";
 import { userDetails } from "../InterFace/interFace";
-import { ChatConnectionsModel } from "../model/chatConnectionSchema";
 import client from "../redis/redisConnect";
 
 class userInformation {
