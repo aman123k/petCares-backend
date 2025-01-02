@@ -11,7 +11,7 @@ interface User {
   Auth: { [key: string]: string };
   Favourites: string[];
   postAddTime: string;
-  isApproved: boolean;
+  isApproved: string;
   isAdopted: boolean;
 }
 
@@ -28,7 +28,7 @@ const petlistSchema = new Schema<UserDocument>({
   Auth: { type: Object, trim: true, required: true },
   Favourites: { type: [String], trim: true },
   postAddTime: { type: String, trim: true, required: true },
-  isApproved: { type: Boolean, required: true, trim: true },
+  isApproved: { type: String, required: true, trim: true },
   isAdopted: { type: Boolean, required: true, trim: true },
 });
 

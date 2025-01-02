@@ -14,7 +14,7 @@ class GetPetInformation {
       const skip = (page - 1) * limit;
 
       const query: any = {
-        isApproved: true,
+        isApproved: "approved",
         isAdopted: false,
       };
 

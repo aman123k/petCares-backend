@@ -33,7 +33,7 @@ class AddPetController {
           email: userDetails?.user.email,
           name: userDetails?.user?.username,
         },
-        isApproved: false,
+        isApproved: "pending",
         isAdopted: false,
         postAddTime: new Date(),
       });
