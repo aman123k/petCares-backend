@@ -72,9 +72,19 @@ class GetPetInformation {
     try {
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
-      const favoritePets = await PetListModel.find({
-        Favourites: userDetails?.user?.email,
-      }).select("-Favourites -isApproved -isAdopted -isApproved -isAdopted");
+
+      // Fetch favorite pets where the user's email exists in the Favourites array
+      const pets = await PetListModel.find({
+        Favourites: { $elemMatch: { $eq: userDetails.user.email } },
+      }).select("-isApproved -isAdopted");
+
+      // Filter the Favourites array to include only the user's email
+      const favoritePets = pets.map((pet) => ({
+        ...pet.toObject(),
+        Favourites: pet.Favourites.filter(
+          (email: string) => email === userDetails.user.email
+        ),
+      }));
       res.status(200).json({
         success: true,
         response: favoritePets,
