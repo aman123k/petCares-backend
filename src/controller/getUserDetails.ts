@@ -11,11 +11,12 @@ class userInformation {
     try {
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
-      const userEmail: string = userDetails?.user?.email;
+      const userEmail: string = userDetails?.user?.email ?? "";
 
       // Check Redis cache first if user data is there then retun the user data
 
       const RedisUser = await client.get(userEmail);
+
       if (RedisUser) {
         return res.status(200).json({
           success: true,

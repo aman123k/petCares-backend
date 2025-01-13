@@ -75,11 +75,11 @@ class GetPetInformation {
 
       // Fetch favorite pets where the user's email exists in the Favourites array
       const pets = await PetListModel.find({
-        Favourites: { $elemMatch: { $eq: userDetails.user.email } },
+        Favourites: { $elemMatch: { $eq: userDetails?.user?.email } },
       }).select("-isApproved -isAdopted");
 
       // Filter the Favourites array to include only the user's email
-      const favoritePets = pets.map((pet) => ({
+      const favoritePets = pets?.map((pet) => ({
         ...pet.toObject(),
         Favourites: pet.Favourites.filter(
           (email: string) => email === userDetails.user.email
