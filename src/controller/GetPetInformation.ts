@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
-import { verifyToken } from "../token/jwtTpken";
+import { verifyToken } from "../token/jwtToken";
 import { userDetails } from "../InterFace/interFace";
 import client from "../redis/redisConnect";
 
@@ -46,7 +46,7 @@ class GetPetInformation {
         .skip(skip)
         .limit(limit)
         .lean()
-        .select("-isApproved -isAdopted -Favourites");
+        .select("-isApproved -isAdopted -Favorites");
 
       const totalDoc = await PetListModel.countDocuments(query);
 
@@ -68,20 +68,20 @@ class GetPetInformation {
       });
     }
   };
-  static GetFavouritesPets = async (req: Request, res: Response) => {
+  static GetFavoritesPets = async (req: Request, res: Response) => {
     try {
       const token = req.cookies?.PetCaresAccessToken;
       const userDetails = verifyToken(token) as userDetails;
 
-      // Fetch favorite pets where the user's email exists in the Favourites array
+      // Fetch favorite pets where the user's email exists in the Favorites array
       const pets = await PetListModel.find({
-        Favourites: { $elemMatch: { $eq: userDetails?.user?.email } },
+        Favorites: { $elemMatch: { $eq: userDetails?.user?.email } },
       }).select("-isApproved -isAdopted");
 
-      // Filter the Favourites array to include only the user's email
+      // Filter the Favorites array to include only the user's email
       const favoritePets = pets?.map((pet) => ({
         ...pet.toObject(),
-        Favourites: pet.Favourites.filter(
+        Favorites: pet.Favorites.filter(
           (email: string) => email === userDetails.user.email
         ),
       }));
@@ -90,7 +90,7 @@ class GetPetInformation {
         response: favoritePets,
       });
     } catch (err) {
-      console.log("get favourite pet", err);
+      console.log("get favorites pet", err);
       res.status(500).json({
         success: false,
         response: "Server error",

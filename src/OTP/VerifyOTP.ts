@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { UserModel } from "../model/userSchema";
 import client from "../redis/redisConnect";
 import bcrypt from "bcrypt";
-import { createToken } from "../token/jwtTpken";
+import { createToken } from "../token/jwtToken";
 
 const verifyOTP = async (req: Request, res: Response) => {
   const { email, newPass, otp } = req.body;

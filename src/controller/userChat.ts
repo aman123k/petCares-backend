@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { UserModel } from "../model/userSchema";
-import { verifyToken } from "../token/jwtTpken";
+import { verifyToken } from "../token/jwtToken";
 import { userDetails } from "../InterFace/interFace";
 import { ChatConnectionsModel } from "../model/chatConnectionSchema";
 import { messagesModel } from "../model/chatSchema";
@@ -49,7 +49,7 @@ class userChat {
         isBlock: [],
         userEmail: [firstUser?.email, secondUser?.email],
         lastMessage:
-          "PetCares: Monitoring adopter-rehouser chat for pet welfare and support",
+          "PetCares: Monitoring adopter-rehouse chat for pet welfare and support",
         time: new Date(),
       });
       await Connection.save();
@@ -70,8 +70,8 @@ class userChat {
   static getChatConnection = async (req: Request, res: Response) => {
     try {
       const token = req.cookies?.PetCaresAccessToken;
-      const userDetais = verifyToken(token) as userDetails;
-      const id = userDetais?.user?._id;
+      const userDetails = verifyToken(token) as userDetails;
+      const id = userDetails?.user?._id;
       const allConnection = await ChatConnectionsModel.find({
         $or: [
           {
@@ -104,13 +104,13 @@ class userChat {
     }
   };
   // Send Message fun
-  static Sendmessages = async (req: Request, res: Response) => {
+  static SendMessages = async (req: Request, res: Response) => {
     try {
       const { id, message } = req.body;
       const token = req.cookies?.PetCaresAccessToken;
-      const userDetais = verifyToken(token) as userDetails;
+      const userDetails = verifyToken(token) as userDetails;
       const chats = new messagesModel({
-        sender: userDetais?.user?.email,
+        sender: userDetails?.user?.email,
         message: message,
         chatId: id,
         time: new Date(),
@@ -134,13 +134,13 @@ class userChat {
     }
   };
 
-  static reciveMessage = async (req: Request, res: Response) => {
+  static receiveMessage = async (req: Request, res: Response) => {
     try {
       const { id } = req.body;
       const allMessage: Array<Message> = await messagesModel.find({
         chatId: id,
       });
-      let chatdData: GroupedData = {};
+      let chatsData: GroupedData = {};
 
       for (const item of allMessage) {
         const { time } = item;
@@ -151,24 +151,24 @@ class userChat {
           year: "numeric",
         });
         if (time) {
-          if (!chatdData[day]) {
-            chatdData[day] = [];
+          if (!chatsData[day]) {
+            chatsData[day] = [];
           }
-          chatdData[day].push(item);
+          chatsData[day].push(item);
         }
       }
-      const dataArray = Object.entries(chatdData).map(([day, messages]) => ({
+      const dataArray = Object.entries(chatsData).map(([day, messages]) => ({
         day,
         messages,
       }));
       res.status(200).json({
         success: true,
         response: dataArray,
-        intialmessage:
-          "PetCares: Monitoring adopter-rehouser chat for pet welfare and support",
+        initialMessage:
+          "PetCares: Monitoring adopter-rehouses chat for pet welfare and support",
       });
     } catch (err) {
-      console.log("recive messages err", err);
+      console.log("receive messages err", err);
       res.status(500).json({
         success: false,
         response: "Server error",
@@ -200,21 +200,21 @@ class userChat {
   static blockUser = async (req: Request, res: Response) => {
     try {
       const { id, email, name } = req.body;
-      const alreayBlock = await ChatConnectionsModel.findOne({ _id: id });
+      const alreadyBlock = await ChatConnectionsModel.findOne({ _id: id });
 
-      if (!alreayBlock?.isBlock.includes(email)) {
-        alreayBlock?.isBlock.push(email);
-        await alreayBlock?.save();
+      if (!alreadyBlock?.isBlock.includes(email)) {
+        alreadyBlock?.isBlock.push(email);
+        await alreadyBlock?.save();
         res.status(200).json({
           success: true,
           response: `You block ${name}`,
         });
       } else {
-        const newdocs = alreayBlock.isBlock.filter((block) => {
+        const newDocs = alreadyBlock.isBlock.filter((block) => {
           return block !== email;
         });
-        alreayBlock.isBlock = newdocs;
-        await alreayBlock.save();
+        alreadyBlock.isBlock = newDocs;
+        await alreadyBlock.save();
         res.status(200).json({
           success: true,
           response: `You unblock ${name}`,

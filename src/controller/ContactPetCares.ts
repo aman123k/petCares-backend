@@ -2,20 +2,20 @@ import { Request, Response } from "express";
 import { ContactModel } from "../model/contactPetCares";
 
 class contactPetCares {
-  static contect = async (req: Request, res: Response) => {
+  static contact = async (req: Request, res: Response) => {
     try {
-      const { name, email, phone, enquriyAbout, enquriyIs } = req.body;
+      const { name, email, phone, enquiryAbout, enquiryIs } = req.body;
       const docs = new ContactModel({
         name,
         email,
         phone,
-        enquriyAbout,
-        enquriyIs,
+        enquiryAbout,
+        enquiryIs,
       });
       await docs.save();
       res.status(200).json({
         success: true,
-        response: "Enquriy successfully send to Admin",
+        response: "Enquiry successfully send to Admin",
       });
     } catch (err) {
       console.log("contact page", err);

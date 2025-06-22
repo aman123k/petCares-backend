@@ -2,7 +2,7 @@ import express, { Request, Response } from "express";
 import { config } from "dotenv";
 import fetch from "cross-fetch";
 import { UserModel } from "../model/userSchema";
-import { createToken } from "../token/jwtTpken";
+import { createToken } from "../token/jwtToken";
 config();
 
 class AuthFile {

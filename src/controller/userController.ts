@@ -1,7 +1,7 @@
 import { UserModel } from "../model/userSchema";
 import { Request, Response } from "express";
 import bcrypt from "bcrypt";
-import { createToken, verifyToken } from "../token/jwtTpken";
+import { createToken, verifyToken } from "../token/jwtToken";
 import { userDetails } from "../InterFace/interFace";
 import client from "../redis/redisConnect";
 
@@ -92,10 +92,10 @@ class userController {
   };
   static userLogOut = async (req: Request, res: Response): Promise<void> => {
     const token = req.cookies?.PetCaresAccessToken;
-    const userDetais = verifyToken(token) as userDetails;
-    const userEmail: string = userDetais?.user?.email;
+    const userDetails = verifyToken(token) as userDetails;
+    const userEmail: string = userDetails?.user?.email;
     try {
-      if (userDetais) {
+      if (userDetails) {
         res.cookie("PetCaresAccessToken", "", {
           httpOnly: true,
           secure: true,

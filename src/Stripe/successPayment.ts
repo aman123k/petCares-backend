@@ -29,7 +29,7 @@ const handlePaymentSuccess = async (req: Request, res: Response) => {
       const mailOptions = {
         from: process.env.SENDER_EMAIL,
         to: session?.customer_details?.email,
-        subject: "PetCares password reset",
+        subject: "🎉 Meet Your New Best Friend from PetCares!",
         html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif">
   <div
     class="container"

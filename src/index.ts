@@ -53,8 +53,8 @@ async function startServer() {
     };
 
     io.on("connection", (socket: Socket) => {
-      socket.on("userConnected", (connetUser: { email: string }) => {
-        connectedUser(connetUser.email, socket.id);
+      socket.on("userConnected", (connectUser: { email: string }) => {
+        connectedUser(connectUser.email, socket.id);
         io.emit("onlineUser", users);
       });
       socket.on("joinRoom", (room: string) => {

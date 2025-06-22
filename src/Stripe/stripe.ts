@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
-import { verifyToken } from "../token/jwtTpken";
+import { verifyToken } from "../token/jwtToken";
 import { userDetails } from "InterFace/interFace";
 config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_API_KEY);
@@ -10,7 +10,7 @@ const checkout = async (req: Request, res: Response) => {
   try {
     const { id, fee } = req.body;
     const token = req.cookies?.PetCaresAccessToken;
-    const userDetais = verifyToken(token) as userDetails;
+    const userDetails = verifyToken(token) as userDetails;
 
     if (!id || !fee) {
       return res.status(400).json({
@@ -32,7 +32,7 @@ const checkout = async (req: Request, res: Response) => {
               description: `Color: ${findPet?.characteristics?.petColor}, Breed: ${findPet?.characteristics?.petBreed}, Size: ${findPet?.characteristics?.petSize}, Age: ${findPet?.characteristics?.petAge}, Reason for Rehousing: ${findPet?.reason}`,
               // metadata: {
               //   petId: findPet?._id,
-              //   userId: userDetais?.user?.email,
+              //   userId: userDetails?.user?.email,
               // },
             },
             unit_amount: fee * 100,
@@ -40,7 +40,7 @@ const checkout = async (req: Request, res: Response) => {
           quantity: 1,
         },
       ],
-      customer_email: userDetais?.user?.email,
+      customer_email: userDetails?.user?.email,
       mode: "payment",
       success_url: `${process.env.RequestPort}/success?session_id={CHECKOUT_SESSION_ID}'`,
       cancel_url: `${process.env.RequestPort}/adopt-a-pet`,

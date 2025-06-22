@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
-import { verifyToken } from "../token/jwtTpken";
+import { verifyToken } from "../token/jwtToken";
 import { UserModel } from "../model/userSchema";
 import ImageUpload from "../cloudinary/uploader";
-import ImageDete from "../cloudinary/deleteImage";
+import ImageDelete from "../cloudinary/deleteImage";
 import { userDetails } from "../InterFace/interFace";
 import client from "../redis/redisConnect";
 
@@ -82,7 +82,7 @@ class userInformation {
       };
 
       if (image) {
-        await ImageDete(userDet.picture ?? "");
+        await ImageDelete(userDet.picture ?? "");
         const response = await ImageUpload(image);
         await updateUserAndChat({ picture: response, username: userName });
       } else {

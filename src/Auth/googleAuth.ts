@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import fetch from "cross-fetch";
 import { UserModel } from "../model/userSchema";
-import { createToken } from "../token/jwtTpken";
+import { createToken } from "../token/jwtToken";
 
 class authFile {
   static googleLogin = async (req: Request, res: Response) => {

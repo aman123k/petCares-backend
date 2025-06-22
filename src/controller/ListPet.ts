@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import ImageUpload from "../cloudinary/uploader";
 import { PetListModel } from "../model/listSchema";
-import { verifyToken } from "../token/jwtTpken";
+import { verifyToken } from "../token/jwtToken";
 import { userDetails } from "../InterFace/interFace";
 
 class AddPetController {
@@ -51,12 +51,12 @@ class AddPetController {
       });
     }
   };
-  static AddFavourites = async (req: Request, res: Response) => {
+  static AddFavorites = async (req: Request, res: Response) => {
     try {
       const { id } = req.body;
       const token = req.cookies?.PetCaresAccessToken;
-      const userDetais = verifyToken(token) as userDetails;
-      if (!userDetais) {
+      const userDetails = verifyToken(token) as userDetails;
+      if (!userDetails) {
         res.status(400).json({
           success: false,
           response: "Please login to add",
@@ -65,8 +65,8 @@ class AddPetController {
       }
       const docs = await PetListModel.findOne({ _id: id });
       if (docs) {
-        if (!docs?.Favourites.includes(userDetais?.user?.email)) {
-          docs.Favourites.push(userDetais?.user?.email);
+        if (!docs?.Favorites.includes(userDetails?.user?.email)) {
+          docs.Favorites.push(userDetails?.user?.email);
           await docs.save();
           res.status(200).json({
             success: true,
@@ -74,10 +74,10 @@ class AddPetController {
           });
           return;
         } else {
-          const newdocs = docs.Favourites.filter((favourites) => {
-            return favourites !== userDetais?.user?.email;
+          const newDocs = docs.Favorites.filter((Favorites) => {
+            return Favorites !== userDetails?.user?.email;
           });
-          docs.Favourites = newdocs;
+          docs.Favorites = newDocs;
           await docs.save();
           res.status(200).json({
             success: true,

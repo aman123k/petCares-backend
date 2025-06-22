@@ -5,10 +5,10 @@ export interface userDetails {
     username: string;
   };
 }
-export interface PetsdataType {
+export interface PetsDataType {
   _id: string;
   Auth: { email: string; name: string };
-  Favourites: string[];
+  Favorites: string[];
   characteristics: { name: string };
   petImage: string[];
   petType: string;

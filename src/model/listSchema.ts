@@ -9,7 +9,7 @@ interface User {
   characteristics: { [key: string]: string };
   keyFact: { [key: string]: string };
   Auth: { [key: string]: string };
-  Favourites: string[];
+  Favorites: string[];
   postAddTime: string;
   isApproved: string;
   isAdopted: boolean;
@@ -26,7 +26,7 @@ const petlistSchema = new Schema<UserDocument>({
   characteristics: { type: Object, trim: true, required: true },
   keyFact: { type: Object, trim: true, required: true },
   Auth: { type: Object, trim: true, required: true },
-  Favourites: { type: [String], trim: true },
+  Favorites: { type: [String], trim: true },
   postAddTime: { type: String, trim: true, required: true },
   isApproved: { type: String, required: true, trim: true },
   isAdopted: { type: Boolean, required: true, trim: true },
