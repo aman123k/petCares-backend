@@ -1,9 +1,10 @@
 import { config } from "dotenv";
 import { Request, Response } from "express";
 import { PetListModel } from "../model/listSchema";
-import nodemailer from "nodemailer";
 import client from "../redis/redisConnect";
+import { Resend } from "resend";
 config();
+
 const stripe = require("stripe")(process.env.STRIPE_SECRET_API_KEY);
 
 const handlePaymentSuccess = async (req: Request, res: Response) => {
@@ -26,8 +27,12 @@ const handlePaymentSuccess = async (req: Request, res: Response) => {
       );
       const updatePets = await updatePetsDetails?.save();
 
-      const mailOptions = {
-        from: process.env.SENDER_EMAIL,
+      // Send OTP via email using Resend service
+      const resend = new Resend(process.env.RESEND_API_KEY as string);
+
+      // Send the email
+      await resend.emails.send({
+        from: process.env.SENDER_EMAIL as string,
         to: session?.customer_details?.email,
         subject: "🎉 Meet Your New Best Friend from PetCares!",
         html: `<body style="margin: 0; padding: 0; font-family: Arial, sans-serif">
@@ -145,22 +150,6 @@ const handlePaymentSuccess = async (req: Request, res: Response) => {
   </div>
 </body>
 `,
-      };
-
-      const transporter = nodemailer.createTransport({
-        host: "smtp-relay.brevo.com",
-        port: 587,
-        auth: {
-          user: process.env.AUTH_EMAIL,
-          pass: process.env.SMTP_KEY,
-        },
-      });
-      await transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-          console.log("Error:", error);
-        } else {
-          console.log("Email sent:", info.response);
-        }
       });
 
       const keys = await client.keys("pets:*");

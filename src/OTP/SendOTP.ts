@@ -1,7 +1,9 @@
+import { config } from "dotenv";
+config();
 import { Request, Response } from "express";
-import nodemailer from "nodemailer";
 import { UserModel } from "../model/userSchema";
 import client from "../redis/redisConnect";
+import { Resend } from "resend";
 
 const sendOTP = async (req: Request, res: Response) => {
   const { email } = req.body;
@@ -21,10 +23,14 @@ const sendOTP = async (req: Request, res: Response) => {
       await client.set("OTP", OTP.toString(), { EX: 300 });
     }
 
-    const mailOptions = {
-      from: process.env.SENDER_EMAIL,
+    // Send OTP via email using Resend service
+    const resend = new Resend(process.env.RESEND_API_KEY as string);
+
+    // Send the email
+    const { data, error } = await resend.emails.send({
+      from: process.env.SENDER_EMAIL as string,
       to: email,
-      subject: "PetCares password reset",
+      subject: "Your OTP for Password Reset",
       html: ` <body style="margin: 0; padding: 0; font-family: Arial, sans-serif">
     <div
       class="container"
@@ -192,23 +198,15 @@ const sendOTP = async (req: Request, res: Response) => {
       </div>
     </div>
   </body>`,
-    };
+    });
+    // Handle any errors during email sending
+    if (error) {
+      return res.status(500).json({
+        status: false,
+        message: "Failed to send OTP. Please try again later.",
+      });
+    }
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp-relay.brevo.com",
-      port: 587,
-      auth: {
-        user: process.env.AUTH_EMAIL,
-        pass: process.env.SMTP_KEY,
-      },
-    });
-    await transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.log("Error:", error);
-      } else {
-        console.log("Email sent:", info.response);
-      }
-    });
     res.status(200).json({
       success: true,
       response: "OTP send to your gmail..",
